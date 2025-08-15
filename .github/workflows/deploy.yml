@@ -1,8 +1,44 @@
-name: GameModel-CLICD
+name: CI/CD with SonarQube & Deploy
 on: [push]
+
 jobs:
-  build:
+  test-and-scan:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - run: echo "Workflow executed!"
+      # Étape 1: Checkout du code
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Étape 2: Installation des dépendances (ex: Node.js)
+      - name: Install dependencies
+        run: npm install
+
+      # Étape 3: Exécution des tests
+      - name: Run tests
+        run: npm test
+
+      # Étape 4: Analyse SonarQube (requiert Java)
+      - name: Set up Java
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+
+      - name: Run SonarQube Analysis
+        uses: sonarsource/sonarqube-scan-action@master
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}  # Ex: https://sonarcloud.io
+
+  deploy:
+    needs: test-and-scan  # Attend que les tests et SonarQube terminent
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build project
+        run: npm run build  # Adaptez à votre outil de build
+
+      - name: Deploy to production
+        run: |
+          
