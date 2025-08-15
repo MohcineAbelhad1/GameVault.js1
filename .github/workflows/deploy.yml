@@ -1,14 +1,9 @@
 steps:
-  - name: Checkout code
-    uses: actions/checkout@v4
-    with:
-      fetch-depth: 0  # Important pour les projets avec sous-modules
+  - uses: actions/checkout@v4  # Properly clones your repo
 
-  - name: Debug - Lister les fichiers
-    run: |
-      ls -la  # Affiche la structure des fichiers
-      echo "Chemin actuel : $(pwd)"
+  - name: Debug - List files
+    run: ls -la  # Verify files are cloned correctly
 
   - name: Install dependencies
-    if: exists('package.json')  # Ne s'exécute que si package.json existe
     run: npm install
+    working-directory: ./  # Ensures it runs in root
